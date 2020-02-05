@@ -10,13 +10,53 @@ import UIKit
 import RealmSwift
 
 class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
+    
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    let realm=try! Realm()
+    
+    
+    
+    
+    // DB内のタスクが格納されるリスト。
+    // 日付の近い順でソート：昇順
+    // 以降内容をアップデートするとリスト内は自動的に更新される。
+    var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)  // ←追加
+    
+    
+    
+    var cellbox:[UITableViewCell]=[]
+    
+    
+    
+    
+    
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        tableView.delegate=self
+        tableView.dataSource=self
+        
+        
+    }
+    
+    
+    
+    
+    
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return taskArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        ttt.append(cell)
+        //cellboxにセルを入れていく
+        cellbox.append(cell)
         // Cellに値を設定する.  --- ここから ---
         let task = taskArray[indexPath.row]
         cell.textLabel?.text = task.title
@@ -103,41 +143,16 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     
     
     
-    @IBOutlet weak var tableView: UITableView!
-    
-    let realm=try! Realm()
-    
-    // DB内のタスクが格納されるリスト。
-    // 日付の近い順でソート：昇順
-    // 以降内容をアップデートするとリスト内は自動的に更新される。
-    var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)  // ←追加
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        tableView.delegate=self
-        tableView.dataSource=self
-        
-        
-    }
-    var ttt:[UITableViewCell]=[]
+    //ボタンが押されると全消去
     
     @IBAction func searchbutton(_ sender: Any) {
-        let count=ttt.count-1
+       
+        let count=cellbox.count-1
         print(count)
-        for aaa in 0...count{
-            var hhh = ttt[aaa]
-            var indexPath=tableView.indexPath(for: hhh)
+        //cellboxのセルを一つずつ消していく
+        for cellnumbers in 0...count{
+            var cells = cellbox[cellnumbers]
+            var indexPath=tableView.indexPath(for: cells)
             
             tableView.deleteRows(at: [indexPath!], with: .fade)
             
@@ -146,7 +161,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         }
         
         
-          
+        
         
     }
     
