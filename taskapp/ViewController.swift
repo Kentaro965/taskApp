@@ -26,7 +26,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     
     
     
-    var cellbox:[UITableViewCell]=[]
+    
     
     
     
@@ -41,6 +41,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         tableView.delegate=self
         tableView.dataSource=self
         
+        searchbuttontext.isEnabled=false
         
     }
     
@@ -55,8 +56,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        //cellboxにセルを入れていく
-        cellbox.append(cell)
+        
         // Cellに値を設定する.  --- ここから ---
         let task = taskArray[indexPath.row]
         cell.textLabel?.text = task.title
@@ -142,30 +142,57 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     }
     
     
-    
-    //ボタンが押されると全消去
-    
+   
+        
     @IBAction func searchbutton(_ sender: Any) {
-       
-        let count=cellbox.count-1
-        print(count)
-        //cellboxのセルを一つずつ消していく
-        for cellnumbers in 0...count{
-            var cells = cellbox[cellnumbers]
-            var indexPath=tableView.indexPath(for: cells)
-            
-            tableView.deleteRows(at: [indexPath!], with: .fade)
-            
-            
-            
-        }
+    
+    
+        searchField.text=""
         
+        searchbuttontext.isEnabled=false
         
+        searchbuttontext.setTitle("category", for: .normal)
         
+        taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+        tableView.reloadData()
         
     }
     
+    
+    
+    
+    @IBAction func textFieldchange(_ sender: Any) {
+        if searchField.text != ""{
+        taskArray=try! Realm().objects(Task.self).filter("category='\(searchField.text!)'").sorted(byKeyPath: "date", ascending: true )
+            tableView.reloadData()
+            
+        }
+        searchbuttontext.setTitle("キャンセル",for: .normal)
+        searchbuttontext.isEnabled=true
+        if searchField.text=="" {
+            searchbuttontext.isEnabled=false
+            searchbuttontext.setTitle("category",for: .normal)
+            
+   taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+            tableView.reloadData()
+            
+        }
+        
+    }
+    
+    
+    
+    @IBOutlet weak var searchbuttontext: UIButton!
+    
+    
+    @IBOutlet weak var searchField: UITextField!
+    
+    
+    
+    
 }
+
+
 /*var jadgebutton:Int!=nil
  
  @IBOutlet weak var searchtext: UITextField!
